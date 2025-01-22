@@ -2,7 +2,9 @@ package com.example.board.post.domain;
 
 import com.example.board.author.domain.Author;
 import com.example.board.common.domain.BaseTimeEntity;
+import com.example.board.post.dtos.PostDetailRes;
 import com.example.board.post.dtos.PostListRes;
+import com.example.board.post.dtos.PostUpdatedReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,5 +37,13 @@ public class Post extends BaseTimeEntity {
         return new PostListRes(this.id,this.title,this.author.getEmail());
     }
 
+    public PostDetailRes toDetailDtoFromEntity(){
+        return new PostDetailRes(this.id,this.title,this.contents,this.author.getEmail(),this.getCreatedTime(),this.getUpdatedTime());
+    }
+
+    public void PostUpdate(PostUpdatedReq postUpdatedReq){
+        this.title = postUpdatedReq.getTitle();
+        this.contents = postUpdatedReq.getContents();
+    }
 
 }
