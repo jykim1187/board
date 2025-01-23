@@ -6,5 +6,21 @@
 </head>
 <body>
     <div th:replace="common/header :: headerFragment"></div>
+    <div class="container"></div>
+    <div class="page-header"><h3>글쓰기</h3></div>
+    <form action="/post/create" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="form-group">
+            제목 <input type="text" name="title" class="form-control">
+        </div>
+        <div class="form-group">
+            내용
+            <textarea name="contents" class="form-control" rows="10" maxlength="3000" placeholder="여기에 입력하세요">
+            </textarea>
+        </div>
+        <div class="form-group">
+            이메일 <input type="email" name="email" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-secondary">게시글작성</button>
+    </form>
 </body>
-</html>>
+</html>

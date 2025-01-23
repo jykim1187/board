@@ -7,6 +7,7 @@ import com.example.board.author.dto.AuthorSaveReq;
 import com.example.board.author.dto.AuthorUpdateReq;
 import com.example.board.author.service.AuthorService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,16 +23,22 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
+    @GetMapping("/create")
+    public String register(){
+        return "/author/author_create";
+    }
+
     @PostMapping("/create")
     public String save(@Valid AuthorSaveReq authorSaveReq){
         authorService.save(authorSaveReq);
-        return "ok";
+        return "redirect:/";
     }
 
     @GetMapping("/list")
-    public String findAll(){
+    public String findAll(Model model){
         List<AuthorListRes>  authorListResList =  authorService.findAll();
-        return "author/author_list";
+        model.addAttribute("authorList",authorListResList);
+        return "/author/author_list";
     }
 
 //    원래 deleteMapping이 맞으나 우리는 나중에 화면을 같이 개발할 때 편하게 하기 위해 get으로(왜냐하면 js가 아닌 순수html에는 get,post둘 밖에 없기 때문)
@@ -42,8 +49,9 @@ public class AuthorController {
     }
 
     @GetMapping("/detail/{id}")
-    public AuthorDetailRes findById(@PathVariable Long id){
-       return authorService.fingById(id);
+    public String findById(@PathVariable Long id, Model model){
+       model.addAttribute("author",authorService.fingById(id));
+       return "/author/author_detail";
     }
 
     @PostMapping("update/{id}")//원래라면 PatchMapping이 맞으나 나중에 화면개발 편하게 하기 위해 임시적으로

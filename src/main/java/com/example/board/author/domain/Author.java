@@ -40,6 +40,12 @@ public class Author extends BaseTimeEntity {
     @Builder.Default
     private List<Post> posts = new ArrayList<>();
 
+
+
+
+
+
+
     public AuthorListRes listDtoFromEntity(){
         return new AuthorListRes(this.id,this.name,this.email);
     }

@@ -26,30 +26,37 @@ public class PostController {
         this.postService = postService;
     }
 
+    @GetMapping("/create")
+    public String postRegister(){
+        return"post/post_create";
+    }
+
     @PostMapping("/create")
     public String create(@Valid PostSaveReq postSaveReq){
         postService.save(postSaveReq);
-        return "okay";
+        return "redirect:/post/list";
+//        redirect는 url을 리턴!! html화면이 아니라
     }
 
     @GetMapping("/list")
     public String list(Model model){
-
-        model.addAttribute(postService.findAll());
-        return "author_list";
+        model.addAttribute("postList",postService.findAll());
+        return "post/post_list";
     }
 
     @GetMapping("/list/paging")
 //    페이징처리를 위한 데이터 형식 : localhost:8080/post/list/paging?size=10&page=0&sort=createdTime,desc
-    public Page<PostListRes> listPaging(@PageableDefault(size = 10, sort= "createdTime", direction = Sort.Direction.DESC)Pageable pageable){
+    public String listPaging(Model model, @PageableDefault(size = 10, sort= "createdTime", direction = Sort.Direction.DESC)Pageable pageable){
 // 들어오는 데이터형식에 size와 sort에 관해 입력하지 않아도 여기 default어노테이션을 걸어놓아서 괜찮다.
-        return postService.findAllPaging(pageable);
+        model.addAttribute("postList",postService.findAllPaging(pageable));
+        return "post/post_list";
 
     }
 
-    @GetMapping("/list/{id}")
-    public PostDetailRes findById(@PathVariable Long id){
-           return  postService.findById(id);
+    @GetMapping("/detail/{id}")
+    public String findById(@PathVariable Long id, Model model){
+           model.addAttribute("post",postService.findById(id));
+                   return "/post/post_detail";
     }
 
     @PostMapping("/update/{id}")
