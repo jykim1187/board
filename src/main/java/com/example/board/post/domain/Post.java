@@ -46,4 +46,8 @@ public class Post extends BaseTimeEntity {
         this.contents = postUpdatedReq.getContents();
     }
 
+    public void updateAppointment(String appointment){
+        this.appointment = appointment;
+    }
+
 }

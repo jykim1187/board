@@ -34,7 +34,7 @@ public class PostController {
     @PostMapping("/create")
     public String create(@Valid PostSaveReq postSaveReq){
         postService.save(postSaveReq);
-        return "redirect:/post/list";
+        return "redirect:/post/list/paging";
 //        redirect는 url을 리턴!! html화면이 아니라
     }
 
@@ -52,6 +52,16 @@ public class PostController {
         return "post/post_list";
 
     }
+
+    @GetMapping("/list/fetchjoin")
+    @ResponseBody
+    public String postListFetchJoin(){
+        postService.listFetchJoin();
+        return"ok";
+    }
+
+
+
 
     @GetMapping("/detail/{id}")
     public String findById(@PathVariable Long id, Model model){

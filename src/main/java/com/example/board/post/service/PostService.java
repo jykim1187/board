@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,20 @@ public class PostService {
 
     public void save(PostSaveReq postSaveReq){
         Author author = authorRepository.findByEmail(postSaveReq.getEmail()).orElseThrow(()->new EntityNotFoundException("no id"));
-        postRepository.save(postSaveReq.toEntity(author));
+        LocalDateTime appointmentTime = null;
+       if(postSaveReq.getAppointment().equals("Y")){
+           if(postSaveReq.getAppointmentTime().isEmpty() || postSaveReq.getAppointmentTime()==null){
+               throw new IllegalArgumentException("시간이 비어져있습니다");
+           } else {
+               DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+               appointmentTime = LocalDateTime.parse(postSaveReq.getAppointmentTime(), dateTimeFormatter);
+               LocalDateTime now = LocalDateTime.now();
+               if (appointmentTime.isBefore(now)) {
+                   throw new IllegalArgumentException("시간이 과거입니다");
+               }
+           }
+       }
+        postRepository.save(postSaveReq.toEntity(author,appointmentTime));
     }
 
 
@@ -39,8 +54,18 @@ public class PostService {
     }
 
     public Page<PostListRes> findAllPaging(Pageable pageable){
-        Page<Post> pagePosts = postRepository.findAll(pageable);
+        Page<Post> pagePosts = postRepository.findAllByAppointment(pageable,"N");
         return pagePosts.map(p->p.toListFromEntity());
+    }
+
+    public List<PostListRes> listFetchJoin(){
+//        일반 JOIN :  author를 join해서 post를 조회하긴 하나, author의 데이터는 실제 참조할 때 쿼리가 n번 발생
+//        List<Post> postList = postRepository.findAlljoin(); //쿼리 1번
+
+//      FETCH JOIN :author를 join해서 조회하고, author의 데이터도 join 시점에서 가져옴,쿼리 1번 발생
+        List<Post> postList = postRepository.findAllFetchJoin();
+        return postList.stream().map(p->p.toListFromEntity()).collect(Collectors.toList()); //쿼리 n번
+
     }
 
     public PostDetailRes findById(Long id){
